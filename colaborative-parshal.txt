@@ -1,0 +1,76 @@
+SELECT movieId, (sum(ratings.rating)/50) as score, count(sim.userid) as nbratings 
+FROM (SELECT distances.userid AS userid, dist/(sqrt(my.norm)*sqrt(users.norm)) AS score 
+FROM (SELECT r.userId, sum((m.rating)*(r.rating)) AS dist 
+      FROM ratings r, ratings m 
+      WHERE m.movieId = r.movieId 
+      AND r.userId != 1
+      AND m.userId = 1
+      GROUP BY r.userId 
+     ) as distances, 
+     (SELECT userid, SUM((rating)*(rating)) AS norm FROM ratings GROUP BY userid) as users, 
+     (SELECT sum((rating)*(rating)) AS norm FROM ratings WHERE userId = 1) as my 
+WHERE users.userid = distances.userid 
+ORDER BY score DESC 
+LIMIT 50 ) AS sim, ratings
+WHERE sim.userid= ratings.userid 
+AND ratings.movieId NOT IN (SELECT movieId FROM ratings WHERE userId = 1)
+GROUP BY movieId 
+ORDER BY score desc 
+LIMIT 10
+
+
+SELECT m.movieId AS itemid, m.rating AS myrating, r.rating AS herrating 
+FROM ratings r, ratings m
+WHERE r.userId=158371 AND m.userId = 1 AND r.movieId=m.movieId 
+ORDER BY m.movieId; 
+
+
+SELECT distances.userid AS userid, dist/(sqrt(my.norm)*sqrt(users.norm)) AS score 
+FROM (SELECT r.userId, sum((m.rating)*(r.rating)) AS dist 
+      FROM ratings r, ratings m 
+      WHERE m.movieId = r.movieId 
+      AND r.userId != 1
+      AND m.userId = 1
+      GROUP BY r.userId 
+     ) as distances, 
+     (SELECT userid, SUM((rating)*(rating)) AS norm FROM ratings GROUP BY userid) as users, 
+     (SELECT sum((rating)*(rating)) AS norm FROM ratings WHERE userId = 1) as my 
+WHERE users.userid = distances.userid 
+ORDER BY score DESC 
+LIMIT 30; 
+
+
+SELECT sum((rating)*(rating)) AS norm FROM ratings WHERE userId = 1
+
+
+SELECT userid, SUM((rating)*(rating)) AS norm FROM ratings GROUP BY userid
+
+
+SELECT r.userId, sum((m.rating)*(r.rating)) AS dist 
+      FROM ratings r, ratings m 
+      WHERE m.movieId = r.movieId 
+      AND r.userId != 1
+      AND m.userId = 1
+      GROUP BY r.userId 
+
+
+select distances.userid as userid, dist/(sqrt(my.norm)*sqrt(users.norm)) 
+   as score 
+from (select userid, sum((me.rating)*(ratings.rating)) as dist 
+      from ratings, me 
+      where me.itemid = ratings.itemid 
+      group by userid 
+     ) as distances, 
+     (select userid, sum((rating)*(rating)) as norm 
+      from ratings 
+      group by userid 
+     ) as users, 
+     (select sum((rating)*(rating)) as norm 
+      from me 
+     ) as my 
+where users.userid = distances.userid 
+order by score desc 
+limit 30; 
+
+
+SELECT `userId`, COUNT(`movieId`) AS cnt FROM `ratings` GROUP BY `userId` ORDER BY cnt

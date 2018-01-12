@@ -1,0 +1,5 @@
+Marko TODO:
+https://bitbook.io/simple-how-to-slope-one-user-item-recommender-in-php/
+https://stackoverflow.com/questions/20800777/slope-one-recommender-implementation-using-mysql-stored-procedure
+http://easyrec.sourceforge.net/wiki/index.php/SlopeOne_Recommender
+https://github.com/kasperg/symfony-propel-slope-one-recommendations-plugin
