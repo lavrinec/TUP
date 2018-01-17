@@ -1,0 +1,17 @@
+SELECT vsakfilm.movieId, vsakfilm.title, ROUND((vsakfilm.povprecje*(1+(stgenre/5))*(1-ABS(leto.povleto-LEFT(RIGHT(vsakfilm.title,5),4))/100)),2) as fscore 
+	FROM (SELECT movies.movieId, movies.title, SUM(1) as stgenre, AVG(kriterij.score) as povprecje 
+	from movies,(SELECT rating.genreIme, AVG(((rating.stevilo/skup.sestevek)/(genr.genreSkupaj/skupina.sestevek))* rating.ratingi) as score
+	FROM (SELECT COUNT(filmi.genreIme) as stevilo, genreIme, AVG(filmi.rating) as ratingi 
+      from (SELECT us.movieId, genr.genreIme, ratings.rating 
+            FROM (SELECT movieId, userId 
+                  From ratings where userId=1) as us, genr, movies, ratings 
+            where LOCATE(genr.genreIme, movies.genres) and us.movieId=movies.movieId and ratings.movieId=us.movieId and us.userId=ratings.userId 
+            ORDER by us.movieId ASC) as filmi 
+      GROUP BY genreIme DESC) as rating, genr, (SELECT SUM(genreSkupaj) as sestevek FROM genr) as skupina, (SELECT SUM(pos) as sestevek 
+	  FROM(SELECT COUNT(genr.genreIme) as pos,genr.genreIme 
+	  from (SELECT movieId from ratings where userId=1) as us, genr, movies
+	where LOCATE(genr.genreIme, movies.genres) and movies.movieId=us.movieId GROUP BY genr.genreIme) as posebej) as skup  WHERE rating.genreIme=genr.genreIme
+	GROUP BY genreIme desc) as kriterij
+ where LOCATE(kriterij.genreIme,movies.genres) GROUP BY movies.movieId ORDER BY SUM(1)  desc) as vsakfilm, (SELECT ROUND(AVG(LEFT(RIGHT(movies.title,5),4)),0) as povleto FROM ratings, movies  WHERE ratings.userId=1 and ratings.movieId=movies.movieId) as leto
+ORDER BY fscore desc
+LIMIT 15
