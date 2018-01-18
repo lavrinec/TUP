@@ -9,7 +9,10 @@ import tkinter
 
 #cursor = connection.cursor()
 
-
+import settings
+conn = settings.moobar()
+cn1 = pyodbc.connect(conn, autocommit=False)
+cursor=cn1.cursor()
 
 
 #okno
